@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GST Invoice Calculator — Free Indian Invoice Tool</title>
+  <meta name="description" content="Free GST invoice calculator for Indian freelancers and small businesses. Generate real-time GST invoices with CGST, SGST, IGST, download as PDF. No signup required." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0F1729; --navy-light: #1A2640; --navy-mid: #243352;
+      --saffron: #FF9933; --saffron-light: #FFB347;
+      --white: #FFFFFF; --grey-100: #F4F6FA; --grey-200: #E2E8F0;
+      --grey-400: #8892A4; --grey-600: #4A5568;
+      --green: #22C55E; --red: #EF4444;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--navy); color: var(--white); min-height: 100vh; }
+    header {
+      background: var(--navy); border-bottom: 1px solid var(--navy-mid);
+      padding: 0 2rem; display: flex; align-items: center;
+      justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--white); display: flex; align-items: center; gap: 0.5rem; }
+    .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--saffron); display: inline-block; }
+    .header-badge { font-size: 0.75rem; font-weight: 600; color: var(--saffron); background: rgba(255,153,51,0.12); border: 1px solid rgba(255,153,51,0.3); padding: 0.25rem 0.75rem; border-radius: 20px; letter-spacing: 0.05em; }
+    .hero { padding: 3rem 2rem 2rem; text-align: center; max-width: 700px; margin: 0 auto; }
+    .hero h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; line-height: 1.1; margin-bottom: 1rem; }
+    .hero h1 span { color: var(--saffron); }
+    .hero p { color: var(--grey-400); font-size: 1rem; line-height: 1.6; max-width: 500px; margin: 0 auto; }
+    .app-shell { max-width: 1300px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+    .panel { background: var(--navy-light); border: 1px solid var(--navy-mid); border-radius: 16px; overflow: hidden; }
+    .panel-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--navy-mid); font-family: var(--font-display); font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-400); }
+    .panel-body { padding: 1.5rem; }
+    .form-section { margin-bottom: 1.75rem; }
+    .form-section-title { font-family: var(--font-display); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--saffron); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .form-section-title::after { content: ''; flex: 1; height: 1px; background: var(--navy-mid); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .form-row.full { grid-template-columns: 1fr; }
+    .field label { display: block; font-size: 0.75rem; font-weight: 500; color: var(--grey-400); margin-bottom: 0.4rem; letter-spacing: 0.02em; }
+    .field input, .field select, .field textarea { width: 100%; background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: var(--white); font-family: var(--font-body); font-size: 0.875rem; padding: 0.625rem 0.875rem; outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--saffron); }
+    .field input::placeholder, .field textarea::placeholder { color: var(--grey-400); }
+    .field select option { background: var(--navy-mid); }
+    .field textarea { resize: vertical; min-height: 60px; }
+    .items-table { width: 100%; border-collapse: collapse; margin-bottom: 0.75rem; }
+    .items-table th { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--grey-400); padding: 0.5rem 0.5rem; text-align: left; border-bottom: 1px solid var(--navy-mid); }
+    .items-table td { padding: 0.5rem 0.4rem; vertical-align: middle; }
+    .items-table input { width: 100%; background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; color: var(--white); font-size: 0.8rem; padding: 0.5rem 0.5rem; outline: none; font-family: var(--font-body); transition: border-color 0.15s; }
+    .items-table input:focus { border-color: var(--saffron); }
+    .items-table input::placeholder { color: var(--grey-400); }
+    .item-total { font-size: 0.8rem; font-weight: 600; color: var(--saffron-light); text-align: right; min-width: 70px; }
+    .item-select { width: 100%; background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; color: var(--white); font-size: 0.8rem; padding: 0.5rem 0.4rem; outline: none; font-family: var(--font-body); }
+    .btn-remove { background: none; border: none; cursor: pointer; color: var(--grey-400); font-size: 1rem; padding: 0.25rem; border-radius: 4px; transition: color 0.15s; line-height: 1; }
+    .btn-remove:hover { color: var(--red); }
+    .btn-add-item { background: none; border: 1px dashed var(--navy-mid); border-radius: 8px; color: var(--grey-400); font-size: 0.8rem; font-family: var(--font-body); padding: 0.6rem 1rem; cursor: pointer; width: 100%; transition: all 0.15s; }
+    .btn-add-item:hover { border-color: var(--saffron); color: var(--saffron); }
+    .tax-options { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .tax-btn { flex: 1; padding: 0.5rem; background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: var(--grey-400); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: var(--font-body); text-align: center; }
+    .tax-btn.active { background: rgba(255,153,51,0.12); border-color: var(--saffron); color: var(--saffron); }
+    .actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+    .btn-primary { flex: 1; background: var(--saffron); color: var(--navy); border: none; border-radius: 10px; padding: 0.875rem 1.5rem; font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+    .btn-primary:hover { background: var(--saffron-light); }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-secondary { background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.08); color: var(--white); border-radius: 10px; padding: 0.875rem 1.25rem; font-family: var(--font-display); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .btn-secondary:hover { border-color: var(--grey-400); }
+    /* INVOICE PREVIEW */
+    .invoice-preview { background: var(--white); color: #111; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.4); position: sticky; top: 80px; }
+    .inv-header { background: var(--navy); padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: flex-start; }
+    .inv-company-name { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--white); }
+    .inv-company-sub { font-size: 0.75rem; color: var(--grey-400); margin-top: 0.25rem; }
+    .inv-label { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--saffron); text-align: right; }
+    .inv-number { font-size: 0.75rem; color: var(--grey-400); text-align: right; margin-top: 0.2rem; }
+    .inv-body { padding: 1.5rem 2rem; }
+    .inv-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid #f0f0f0; }
+    .inv-party-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 0.5rem; }
+    .inv-party-name { font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: #111; margin-bottom: 0.2rem; }
+    .inv-party-detail { font-size: 0.75rem; color: #555; line-height: 1.5; }
+    .inv-dates { display: flex; gap: 2rem; margin-bottom: 1.5rem; }
+    .inv-date-block label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #999; display: block; margin-bottom: 0.25rem; }
+    .inv-date-block span { font-size: 0.85rem; font-weight: 600; color: #111; }
+    .inv-items { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+    .inv-items thead tr { background: #F4F6FA; }
+    .inv-items th { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #777; padding: 0.6rem 0.75rem; text-align: left; }
+    .inv-items th:last-child { text-align: right; }
+    .inv-items td { font-size: 0.8rem; color: #333; padding: 0.75rem 0.75rem; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+    .inv-items td:last-child { text-align: right; font-weight: 600; }
+    .inv-item-desc { font-weight: 600; color: #111; }
+    .inv-totals { display: flex; justify-content: flex-end; margin-bottom: 1.5rem; }
+    .inv-totals-table { min-width: 250px; }
+    .totals-row { display: flex; justify-content: space-between; align-items: center; padding: 0.35rem 0; font-size: 0.8rem; color: #555; border-bottom: 1px solid #f0f0f0; }
+    .totals-row:last-child { border-bottom: none; }
+    .totals-row.grand { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: #111; padding-top: 0.75rem; margin-top: 0.25rem; }
+    .totals-row.grand span:last-child { color: #FF9933; }
+    .inv-footer { background: #F4F6FA; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .inv-notes-text { font-size: 0.72rem; color: #888; max-width: 300px; line-height: 1.4; }
+    .inv-stamp-label { font-size: 0.65rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.08em; }
+    .inv-stamp-value { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: #22C55E; margin-top: 0.2rem; }
+    .site-footer { text-align: center; padding: 3rem 2rem 2rem; border-top: 1px solid var(--navy-mid); margin-top: 2rem; }
+    .btn-dh { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--saffron); color: var(--navy); font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; text-decoration: none; padding: 0.875rem 2rem; border-radius: 50px; transition: background 0.15s, transform 0.1s; margin-bottom: 2rem; }
+    .btn-dh:hover { background: var(--saffron-light); transform: translateY(-1px); }
+    .author-block { color: var(--grey-400); font-size: 0.85rem; line-height: 1.8; }
+    .author-block strong { color: var(--white); }
+    .author-block a { color: var(--saffron); text-decoration: none; }
+    .inv-empty-row td { text-align: center; color: #bbb; font-size: 0.8rem; padding: 1.5rem; font-style: italic; }
+    @media (max-width: 900px) {
+      .app-shell { grid-template-columns: 1fr; padding: 1rem; }
+      .invoice-preview { position: static; }
+      .form-row { grid-template-columns: 1fr; }
+      .inv-parties { grid-template-columns: 1fr; gap: 1rem; }
+      .inv-dates { flex-wrap: wrap; gap: 1rem; }
+    }
+    @media (max-width: 600px) {
+      .hero { padding: 2rem 1rem 1rem; }
+      .hero h1 { font-size: 1.75rem; }
+      header { padding: 0 1rem; }
+      .header-badge { display: none; }
+      .inv-body, .inv-header { padding: 1rem; }
+      .inv-footer { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+    @media print {
+      header, .panel, .hero, .site-footer, .actions { display: none !important; }
+      .app-shell { display: block; padding: 0; }
+      .invoice-preview { box-shadow: none; border-radius: 0; position: static; }
+      body { background: white; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="logo-dot"></span>GST Invoice</div>
+  <span class="header-badge">FREE · NO SIGNUP</span>
+</header>
+
+<div class="hero">
+  <h1>GST Invoices,<br /><span>done in seconds.</span></h1>
+  <p>Built for Indian freelancers and small businesses. Fill the form, get a live invoice with correct CGST/SGST/IGST, download or print free forever.</p>
+</div>
+
+<div class="app-shell">
+  <div class="panel">
+    <div class="panel-header">Invoice Details</div>
+    <div class="panel-body">
+
+      <div class="form-section">
+        <div class="form-section-title">Your Business</div>
+        <div class="form-row full"><div class="field"><label>Business / Freelancer Name</label><input type="text" id="sellerName" placeholder="Ravi Kumar Designs" /></div></div>
+        <div class="form-row">
+          <div class="field"><label>GSTIN (optional)</label><input type="text" id="sellerGST" placeholder="22AAAAA0000A1Z5" maxlength="15" /></div>
+          <div class="field"><label>State</label>
+            <select id="sellerState"><option value="">Select state</option><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option selected>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option><option>Delhi</option><option>Jammu & Kashmir</option></select>
+          </div>
+        </div>
+        <div class="form-row full"><div class="field"><label>Address / Contact</label><textarea id="sellerAddress" placeholder="123 MG Road, Pune 411001 · +91 98765 43210"></textarea></div></div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Bill To</div>
+        <div class="form-row full"><div class="field"><label>Client Name / Company</label><input type="text" id="clientName" placeholder="Acme Corp Pvt. Ltd." /></div></div>
+        <div class="form-row">
+          <div class="field"><label>Client GSTIN (optional)</label><input type="text" id="clientGST" placeholder="07BBBBB0000B1Z6" maxlength="15" /></div>
+          <div class="field"><label>Client State</label>
+            <select id="clientState"><option value="">Select state</option><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option><option>Delhi</option><option>Jammu & Kashmir</option></select>
+          </div>
+        </div>
+        <div class="form-row full"><div class="field"><label>Client Address</label><textarea id="clientAddress" placeholder="456 Connaught Place, New Delhi 110001"></textarea></div></div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Invoice Info</div>
+        <div class="form-row">
+          <div class="field"><label>Invoice Number</label><input type="text" id="invNumber" value="INV-001" /></div>
+          <div class="field"><label>Invoice Date</label><input type="date" id="invDate" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Due Date</label><input type="date" id="dueDate" /></div>
+          <div class="field"><label>Currency</label>
+            <select id="currency"><option value="₹">₹ INR</option><option value="$">$ USD</option><option value="€">€ EUR</option><option value="£">£ GBP</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Line Items</div>
+        <table class="items-table">
+          <thead><tr><th style="width:35%">Description</th><th style="width:13%">Qty</th><th style="width:18%">Rate</th><th style="width:14%">GST %</th><th style="width:14%" class="item-total">Total</th><th style="width:6%"></th></tr></thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+        <button class="btn-add-item" onclick="addItem()">+ Add Item</button>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Tax Type</div>
+        <div class="tax-options">
+          <button class="tax-btn active" id="taxCGST" onclick="setTaxType('intrastate')">CGST + SGST<br /><small style="font-weight:400;font-size:0.7rem;">Same state</small></button>
+          <button class="tax-btn" id="taxIGST" onclick="setTaxType('interstate')">IGST<br /><small style="font-weight:400;font-size:0.7rem;">Different state</small></button>
+        </div>
+        <p style="font-size:0.72rem;color:var(--grey-400);margin-top:0.5rem;">Auto-detected when both states are selected above.</p>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Notes</div>
+        <div class="field"><textarea id="notes" placeholder="Payment terms, bank details, thank you note…" style="min-height:80px;"></textarea></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="window.print()">⬇ Download / Print PDF</button>
+        <button class="btn-secondary" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVOICE PREVIEW -->
+  <div class="invoice-preview" id="invoicePreview">
+    <div class="inv-header">
+      <div>
+        <div class="inv-company-name" id="prev-seller">Your Business Name</div>
+        <div class="inv-company-sub" id="prev-seller-sub">GSTIN: —</div>
+        <div class="inv-company-sub" id="prev-seller-addr" style="margin-top:0.25rem;"></div>
+      </div>
+      <div>
+        <div class="inv-label">INVOICE</div>
+        <div class="inv-number" id="prev-inv-num"># INV-001</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <div class="inv-parties">
+        <div>
+          <div class="inv-party-label">From</div>
+          <div class="inv-party-name" id="prev-from">Your Business</div>
+          <div class="inv-party-detail" id="prev-from-gst" style="color:#aaa;font-size:0.7rem;"></div>
+        </div>
+        <div>
+          <div class="inv-party-label">Bill To</div>
+          <div class="inv-party-name" id="prev-to">Client Name</div>
+          <div class="inv-party-detail" id="prev-to-gst" style="color:#aaa;font-size:0.7rem;"></div>
+          <div class="inv-party-detail" id="prev-to-addr"></div>
+        </div>
+      </div>
+      <div class="inv-dates">
+        <div class="inv-date-block"><label>Invoice Date</label><span id="prev-date">—</span></div>
+        <div class="inv-date-block"><label>Due Date</label><span id="prev-due">—</span></div>
+        <div class="inv-date-block"><label>Tax Type</label><span id="prev-tax-type" style="color:#FF9933;">CGST + SGST</span></div>
+      </div>
+      <table class="inv-items">
+        <thead><tr><th>#</th><th>Description</th><th style="text-align:right">Qty</th><th style="text-align:right">Rate</th><th style="text-align:right">GST</th><th style="text-align:right">Amount</th></tr></thead>
+        <tbody id="prev-items"><tr class="inv-empty-row"><td colspan="6">Add line items on the left →</td></tr></tbody>
+      </table>
+      <div class="inv-totals">
+        <div class="inv-totals-table">
+          <div class="totals-row"><span>Subtotal</span><span id="prev-subtotal">₹ 0.00</span></div>
+          <div class="totals-row" id="prev-cgst-row"><span>CGST</span><span id="prev-cgst">₹ 0.00</span></div>
+          <div class="totals-row" id="prev-sgst-row"><span>SGST</span><span id="prev-sgst">₹ 0.00</span></div>
+          <div class="totals-row" id="prev-igst-row" style="display:none;"><span>IGST</span><span id="prev-igst">₹ 0.00</span></div>
+          <div class="totals-row grand"><span>Total Due</span><span id="prev-grand">₹ 0.00</span></div>
+        </div>
+      </div>
+      <div id="prev-notes-block" style="display:none;margin-bottom:1rem;">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#999;margin-bottom:0.4rem;">Notes</div>
+        <div id="prev-notes" style="font-size:0.78rem;color:#555;line-height:1.6;"></div>
+      </div>
+    </div>
+    <div class="inv-footer">
+      <div class="inv-notes-text">Computer-generated invoice. Thank you for your business.</div>
+      <div class="inv-stamp"><div class="inv-stamp-label">Status</div><div class="inv-stamp-value">UNPAID</div></div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div style="margin-bottom:1.5rem;">
+    <a href="https://digitalheroesco.com" target="_blank" rel="noopener" class="btn-dh">⚡ Built for Digital Heroes</a>
+  </div>
+  <div class="author-block">
+    <strong>GST Invoice Calculator</strong> — Free tool for Indian freelancers &amp; small businesses<br />
+    Built by <strong>Sejal Gosai Atram</strong> · <a href="mailto:sejalatram@email.com">sejalatram@email.com</a><br />
+    <span style="font-size:0.78rem;color:var(--grey-400);">No ads · No signup · No data stored · Open source on GitHub</span>
+  </div>
+</footer>
+
+<script>
+  let items = [], taxMode = 'intrastate', itemCounter = 0;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const today = new Date();
+    const due = new Date(today); due.setDate(due.getDate() + 15);
+    document.getElementById('invDate').value = fmtDateInput(today);
+    document.getElementById('dueDate').value = fmtDateInput(due);
+    addItem();
+    bindAll();
+    render();
+  });
+
+  function fmtDateInput(d) { return d.toISOString().split('T')[0]; }
+
+  function fmtDateDisplay(str) {
+    if (!str) return '—';
+    const [y, m, d] = str.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${d} ${months[+m-1]} ${y}`;
+  }
+
+  function fmtMoney(n, sym) {
+    return `${sym} ${Number(n).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+  }
+
+  function autoDetectTax() {
+    const ss = document.getElementById('sellerState').value;
+    const cs = document.getElementById('clientState').value;
+    if (ss && cs) setTaxType(ss === cs ? 'intrastate' : 'interstate');
+  }
+
+  function bindAll() {
+    ['sellerName','sellerGST','sellerState','sellerAddress','clientName','clientGST',
+     'clientState','clientAddress','invNumber','invDate','dueDate','currency','notes'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', () => { autoDetectTax(); render(); });
+        el.addEventListener('change', () => { autoDetectTax(); render(); });
+      }
+    });
+  }
+
+  function addItem() {
+    itemCounter++;
+    items.push({ id: 'item-' + itemCounter, desc: '', qty: 1, rate: '', gst: 18 });
+    renderItemsForm(); render();
+  }
+
+  function removeItem(id) {
+    items = items.filter(i => i.id !== id);
+    renderItemsForm(); render();
+  }
+
+  function renderItemsForm() {
+    const body = document.getElementById('itemsBody');
+    body.innerHTML = '';
+    const sym = document.getElementById('currency')?.value || '₹';
+    items.forEach((item) => {
+      const tr = document.createElement('tr');
+      const base = (parseFloat(item.qty)||0) * (parseFloat(item.rate)||0);
+      const tax = base * (parseFloat(item.gst)||0) / 100;
+      const total = fmtMoney(base + tax, sym);
+      tr.innerHTML = `
+        <td><input type="text" placeholder="Service or product" value="${esc(item.desc)}" oninput="updateItem('${item.id}','desc',this.value)" /></td>
+        <td><input type="number" min="0" step="0.01" value="${item.qty}" oninput="updateItem('${item.id}','qty',this.value)" /></td>
+        <td><input type="number" min="0" step="0.01" placeholder="0" value="${item.rate||''}" oninput="updateItem('${item.id}','rate',this.value)" /></td>
+        <td><select class="item-select" onchange="updateItem('${item.id}','gst',this.value)">
+          ${[0,5,12,18,28].map(v=>`<option value="${v}" ${item.gst==v?'selected':''}>${v}%</option>`).join('')}
+        </select></td>
+        <td class="item-total">${total}</td>
+        <td><button class="btn-remove" onclick="removeItem('${item.id}')">✕</button></td>`;
+      body.appendChild(tr);
+    });
+  }
+
+  function updateItem(id, field, value) {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    item[field] = (['qty','rate','gst'].includes(field)) ? (parseFloat(value)||0) : value;
+    renderItemsForm(); render();
+  }
+
+  function esc(str) { return String(str||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+  function setTaxType(mode) {
+    taxMode = mode;
+    document.getElementById('taxCGST').classList.toggle('active', mode === 'intrastate');
+    document.getElementById('taxIGST').classList.toggle('active', mode === 'interstate');
+    render();
+  }
+
+  function render() {
+    const sym = document.getElementById('currency').value || '₹';
+    const sName = document.getElementById('sellerName').value || 'Your Business Name';
+    const sGST = document.getElementById('sellerGST').value;
+    const sAddr = document.getElementById('sellerAddress').value;
+    document.getElementById('prev-seller').textContent = sName;
+    document.getElementById('prev-seller-sub').textContent = sGST ? `GSTIN: ${sGST}` : 'GSTIN: —';
+    document.getElementById('prev-seller-addr').textContent = sAddr;
+    document.getElementById('prev-from').textContent = sName;
+    document.getElementById('prev-from-gst').textContent = sGST ? `GSTIN: ${sGST}` : '';
+
+    const cName = document.getElementById('clientName').value || 'Client Name';
+    const cGST = document.getElementById('clientGST').value;
+    const cAddr = document.getElementById('clientAddress').value;
+    document.getElementById('prev-to').textContent = cName;
+    document.getElementById('prev-to-gst').textContent = cGST ? `GSTIN: ${cGST}` : '';
+    document.getElementById('prev-to-addr').textContent = cAddr;
+
+    document.getElementById('prev-inv-num').textContent = `# ${document.getElementById('invNumber').value || 'INV-001'}`;
+    document.getElementById('prev-date').textContent = fmtDateDisplay(document.getElementById('invDate').value);
+    document.getElementById('prev-due').textContent = fmtDateDisplay(document.getElementById('dueDate').value);
+    document.getElementById('prev-tax-type').textContent = taxMode === 'intrastate' ? 'CGST + SGST' : 'IGST';
+
+    const prevBody = document.getElementById('prev-items');
+    let subtotal = 0, totalTax = 0;
+    if (items.length === 0) {
+      prevBody.innerHTML = '<tr class="inv-empty-row"><td colspan="6">Add line items on the left →</td></tr>';
+    } else {
+      prevBody.innerHTML = '';
+      items.forEach((item, idx) => {
+        const base = (parseFloat(item.qty)||0) * (parseFloat(item.rate)||0);
+        const tax = base * (parseFloat(item.gst)||0) / 100;
+        subtotal += base; totalTax += tax;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${idx+1}</td><td><div class="inv-item-desc">${item.desc || '<span style="color:#bbb;font-style:italic">No description</span>'}</div></td><td style="text-align:right">${item.qty}</td><td style="text-align:right">${fmtMoney(parseFloat(item.rate)||0,sym)}</td><td style="text-align:right">${item.gst}%</td><td>${fmtMoney(base+tax,sym)}</td>`;
+        prevBody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('prev-subtotal').textContent = fmtMoney(subtotal, sym);
+    document.getElementById('prev-grand').textContent = fmtMoney(subtotal + totalTax, sym);
+
+    if (taxMode === 'intrastate') {
+      const half = totalTax / 2;
+      document.getElementById('prev-cgst-row').style.display = '';
+      document.getElementById('prev-sgst-row').style.display = '';
+      document.getElementById('prev-igst-row').style.display = 'none';
+      document.getElementById('prev-cgst').textContent = fmtMoney(half, sym);
+      document.getElementById('prev-sgst').textContent = fmtMoney(half, sym);
+    } else {
+      document.getElementById('prev-cgst-row').style.display = 'none';
+      document.getElementById('prev-sgst-row').style.display = 'none';
+      document.getElementById('prev-igst-row').style.display = '';
+      document.getElementById('prev-igst').textContent = fmtMoney(totalTax, sym);
+    }
+
+    const notes = document.getElementById('notes').value;
+    const notesBlock = document.getElementById('prev-notes-block');
+    notesBlock.style.display = notes ? '' : 'none';
+    document.getElementById('prev-notes').textContent = notes;
+  }
+
+  function clearAll() {
+    if (!confirm('Clear all fields and start fresh?')) return;
+    items = []; itemCounter = 0;
+    ['sellerName','sellerGST','sellerAddress','clientName','clientGST','clientAddress','notes'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('invNumber').value = 'INV-001';
+    addItem(); render();
+  }
+</script>
+</body>
+</html>
